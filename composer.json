@@ -1,0 +1,52 @@
+{
+	"name": "laravel/laravel",
+	"description": "The Laravel Framework.",
+	"keywords": ["framework", "laravel"],
+	"license": "MIT",
+    "repositories": [
+        {
+            "type":"package",
+            "package": {
+                "name": "almasaeed2010/AdminLTE",
+                "version":"dev-master",
+                "source": {       
+                    "url": "https://github.com/almasaeed2010/AdminLTE.git",
+                    "type": "git",
+                    "reference":"master"
+                }
+            }
+        }
+    ],
+    "require": {
+        "laravel/framework": "4.2.*",
+        "m4tthumphrey/php-gitlab-api": "dev-master",
+        "almasaeed2010/AdminLTE": "dev-master"
+    },
+    "autoload": {
+		"classmap": [
+			"app/commands",
+			"app/controllers",
+			"app/models",
+			"app/database/migrations",
+			"app/database/seeds",
+			"app/tests/TestCase.php"
+		]
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"php artisan clear-compiled",
+			"php artisan optimize"
+		],
+		"post-update-cmd": [
+			"php artisan clear-compiled",
+			"php artisan optimize"
+		],
+		"post-create-project-cmd": [
+			"php artisan key:generate"
+		]
+	},
+	"config": {
+		"preferred-install": "dist"
+	},
+	"minimum-stability": "stable"
+}
