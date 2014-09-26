@@ -10,8 +10,5 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
-
-Route::get('/', function()
-{
-	return View::make('hello');
-});
+Route::get('/', 'Glv\Controller\ApiController@index');
+Route::get('/milestones', 'Glv\Controller\ApiController@milestones');

@@ -1,7 +1,8 @@
 <?php
+namespace Glv\Test;
 
-class ExampleTest extends TestCase {
-
+class ExampleTest extends TestCase
+{
 	/**
 	 * A basic functional test example.
 	 *
@@ -11,7 +12,6 @@ class ExampleTest extends TestCase {
 	{
 		$crawler = $this->client->request('GET', '/');
 
-		$this->assertTrue($this->client->getResponse()->isOk());
+		$thls->assertTrue($this->client->getResponse()->isOk());
 	}
-
 }
