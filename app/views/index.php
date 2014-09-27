@@ -19,8 +19,13 @@
 </head>
 
 <body>
-    <div id='calendar'></div>
+    <div id='loading' class="box" style="min-height: 367px;display: none;">
+        <div class="overlay"></div>
+        <div class="loading-img"></div>
+    </div>
 
+    <div id='calendar'>
+    </div>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
@@ -33,37 +38,73 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js" type="text/javascript"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.0.2/fullcalendar.min.js" type="text/javascript"></script>
 
-    <script type='text/javascript'>
-        $(document).ready(function() {
-         $.ajax({
-            type: "GET",
-            url : "/milestones",
-            success : function(milestones){
-                var events = [];
-                Object.keys(milestones).forEach(function (pk) {
-                    console.log('project ' + pk);
-                    var project = milestones[pk];
-                    Object.keys(project).forEach(function (mk) {
-                        console.log('milestone ' + mk);
-                        var m = project[mk];
-                        if (m['due_date'] == '') {
-                            return;
-                        }
-                        var s = m['due_date'] + " 00:00:00";
-                        var e = m['due_date'] + " 23:59:59";
-                        events.push({
-                            title: m['title'],
-                            start: s,
-                            end: e
-                        });
-                    });
-                });
-                $('#calendar').fullCalendar({
-                    events: events
-                });
+<script type='text/javascript'>
+$(document).ready(function() {
+    var projectColorClassNames = [
+        '#f56954',
+        '#f39c12',
+        '#00c0ef',
+        '#3c8dbc',
+        '#39cccc',
+        '#0073b7',
+        '#3d9970',
+        '#01ff70',
+        '#ff851b',
+        '#001f3f',
+        '#f012be',
+        '#932ab6',
+        '#00a65a',
+        '#85144b',
+    ];
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        loading: function(bool, view) {
+            if (bool) {
+                $('#loading').show();
+            } else {
+                $('#loading').hide();
             }
-        },"json");
-     });
- </script>
+        },
+        viewRender: function (view, elem) {
+            $.ajax({
+                type: "GET",
+                url : "/milestones",
+                success : function(milestones){
+                   var events = [];
+                   Object.keys(milestones).forEach(function (pk) {
+                       var project = milestones[pk];
+                       Object.keys(project).forEach(function (mk) {
+                           var m = project[mk];
+                           if (m['due_date'] === null || m['due_date'] === undefined) {
+                               return;
+                           }
+                           events.push({
+                               id: m['project_id'],
+                               title: '[' + m['path_with_namespace'] + ']' + m['title'],
+                               start: m['due_date'],
+                               allDay: true,
+                               url: m['web_url'],
+                               color: m['state'] !== 'active' ? '#eaeaec' : projectColorClassNames[parseInt(m['project_id'] % projectColorClassNames.length)],
+                           });
+                       });
+                   });
+                   $('#calendar').fullCalendar('removeEvents');
+                   $('#calendar').fullCalendar('addEventSource', events);
+                }
+            },"json");
+        },
+        eventClick: function(event) {
+            if (event.url) {
+                window.open(event.url);
+                return false;
+            }
+        }
+    });
+});
+</script>
 
 </body>
