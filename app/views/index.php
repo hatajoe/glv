@@ -37,6 +37,7 @@
     <!-- fullCalendar -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.min.js" type="text/javascript"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.0.2/fullcalendar.min.js" type="text/javascript"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.0.2/gcal.js" type="text/javascript"></script>
 
 <script type='text/javascript'>
 $(document).ready(function() {
@@ -65,16 +66,24 @@ $(document).ready(function() {
         loading: function(bool, view) {
             if (bool) {
                 $('#loading').show();
+                $('#loading').hide();
             } else {
                 $('#loading').hide();
+                $('#calendar').show();
             }
         },
+        eventSources: [{
+          url: 'https://www.google.com/calendar/feeds/japanese__ja%40holiday.calendar.google.com/public/basic',
+          currentTimezone: 'Asia/Tokyo',
+          color: '#ff9999'
+        }],
         viewRender: function (view, elem) {
+            var events = [];
+            $('#calendar').fullCalendar('removeEvents');
             $.ajax({
                 type: "GET",
                 url : "/milestones",
                 success : function(milestones){
-                   var events = [];
                    Object.keys(milestones).forEach(function (pk) {
                        var project = milestones[pk];
                        Object.keys(project).forEach(function (mk) {
@@ -92,8 +101,17 @@ $(document).ready(function() {
                            });
                        });
                    });
-                   $('#calendar').fullCalendar('removeEvents');
                    $('#calendar').fullCalendar('addEventSource', events);
+                   $.ajax({
+                      type: "GET",
+                      url: "https://www.google.com/calendar/feeds/japanese__ja%40holiday.calendar.google.com/public/basic",
+                      success: function (es) {
+                        es.forEach(function (e) {
+                            events.push(e);
+                        })
+                        $('#calendar').fullCalendar('addEventSource', events);
+                      }
+                   })
                 }
             },"json");
         },
