@@ -45,19 +45,21 @@ class ApiController extends \BaseController
             $userMapByUserId[$u['id']] = $u;
         }
 
-        $issues = $this->getIssues($this->client);
         $issueMapByUserId = [];
-        foreach ($issues as &$i) {
-            if (empty($i['assignee']['id'])) {
-                continue;
+        foreach ($projects as $p) {
+            $issues = $this->getIssues($this->client, $p);
+            foreach ($issues as $i) {
+                if (empty($i['assignee']['id'])) {
+                    continue;
+                }
+                if (empty($issueMapByUserId[$i['assignee']['id']])) {
+                    $issueMapByUserId[$i['assignee']['id']] = new \stdClass();
+                    $issueMapByUserId[$i['assignee']['id']]->user = $userMapByUserId[$i['assignee']['id']];
+                    $issueMapByUserId[$i['assignee']['id']]->issues = [];
+                }
+                $i['web_url'] = $projectMapByProjectId[$i['project_id']]['web_url'] . '/issues/' . $i['iid'];
+                $issueMapByUserId[$i['assignee']['id']]->issues[] = $i;
             }
-            if (empty($issueMapByUserId[$i['assignee']['id']])) {
-                $issueMapByUserId[$i['assignee']['id']] = new \stdClass();
-                $issueMapByUserId[$i['assignee']['id']]->user = $userMapByUserId[$i['assignee']['id']];
-                $issueMapByUserId[$i['assignee']['id']]->issues = [];
-            }
-            $i['web_url'] = $projectMapByProjectId[$i['project_id']]['web_url'] . '/issues/' . $i['iid'];
-            $issueMapByUserId[$i['assignee']['id']]->issues[] = $i;
         }
         $data = [
             'members' => $issueMapByUserId
@@ -97,13 +99,13 @@ class ApiController extends \BaseController
         return $projects;
     }
 
-    private function getIssues($client)
+    private function getIssues($client, $project)
     {
         $page = 1;
         $hasNext = true;
         $issues = [];
         while ($hasNext) {
-            $is = $client->api('issues')->all(null, $page, 100);
+            $is = $client->api('issues')->all($project['id'], $page, 100);
             foreach ($is as $i) {
                 $issues[] = $i;
             }

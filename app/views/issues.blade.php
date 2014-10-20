@@ -14,7 +14,7 @@
     </div><!-- /.box-header -->
     <div class="box-body table-responsive">
         <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs pull-right">
+            <ul class="nav nav-tabs">
             <?php $i = 0; ?>
             @foreach ($members as $m)
                 @if ($i == 0)
@@ -35,7 +35,7 @@
                     <div class="tab-pane" id="user-{{ $m->user['id'] }}">
                 @endif
                 <?php ++$i; ?>
-                    <table id="example1" class="table table-bordered table-striped">
+                    <table id="example{{ $m->user['id'] }}" class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th>id</th>
@@ -61,7 +61,7 @@
                         <tfoot>
                             <tr>
                                 <th>id</th>
-                                <th>description</th>
+                                <th>title</th>
                                 <th>state</th>
                                 <th>milestone</th>
                                 <th>created_at</th>
@@ -77,17 +77,12 @@
 </sction>
 @stop
 @section('js')
+<!-- page script -->
 <script type="text/javascript">
 $(function() {
-    $("#example1").dataTable();
-    $('#example2').dataTable({
-        "bPaginate": true,
-        "bLengthChange": false,
-        "bFilter": false,
-        "bSort": true,
-        "bInfo": true,
-        "bAutoWidth": false
-    });
+    @foreach ($members as $m)
+        $("#example{{ $m->user['id'] }}").dataTable();
+    @endforeach
 });
 </script>
 @stop
