@@ -49,8 +49,12 @@
                             @foreach ($m->issues as $i)
                                 <tr>
                                     <th>{{ $i['id'] }}</th>
-                                    <th><a href='{{ $i["web_url"] }}' target=”_blank”>{{ $i['title'] }}</a></th>
-                                    <th>{{ $i['milestone']['title'] }}</th>
+                                    <th><a href='{{ $i["issue_url"] }}' target=”_blank”>{{ $i['title'] }}</a></th>
+                                    @if (isset($i["milestone_url"]))
+                                        <th><a href='{{ $i["milestone_url"] }}' target=”_blank”>{{ $i['milestone']['title'] }}</a></th>
+                                    @else
+                                        <th>{{ $i['milestone']['title'] }}</th>
+                                    @endif
                                     <th>{{ $i['created_at'] }}</th>
                                     <th>{{ $i['updated_at'] }}</th>
                                 </tr>

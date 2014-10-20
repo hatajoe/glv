@@ -64,7 +64,10 @@ class ApiController extends \BaseController
                     $issueMapByUserId[$i['assignee']['id']]->user = $userMapByUserId[$i['assignee']['id']];
                     $issueMapByUserId[$i['assignee']['id']]->issues = [];
                 }
-                $i['web_url'] = $projectMapByProjectId[$p['id']]['web_url'] . '/issues/' . $i['iid'];
+                $i['issue_url'] = $projectMapByProjectId[$p['id']]['web_url'] . '/issues/' . $i['iid'];
+                if (isset($i['milestone'])) {
+                    $i['milestone_url'] = $projectMapByProjectId[$p['id']]['web_url'] . '/milestones/' . $i['milestone']['id'];
+                }
                 $issueMapByUserId[$i['assignee']['id']]->issues[] = $i;
             }
         }
