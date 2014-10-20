@@ -12,4 +12,4 @@
 */
 Route::get('/', 'Glv\Controller\ApiController@index');
 Route::get('/milestones', 'Glv\Controller\ApiController@milestones');
-Route::get('/issues', 'Glv\Controller\ApiController@issues');
+Route::get('/issues/{projectId}', 'Glv\Controller\ApiController@issues');

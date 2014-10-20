@@ -64,7 +64,9 @@
                                 <i class="fa fa-angle-left pull-right"></i>
                             </a>
                             <ul class="treeview-menu">
-                                <li><a href="/issues"><i class="fa fa-angle-double-right"></i>issues</a></li>
+                                @foreach ($projects as $p)
+                                    <li><a href="/issues/{{ $p['id'] }}"><i class="fa fa-angle-double-right"></i>{{ $p['path_with_namespace'] }}</a></li>
+                                @endforeach
                             </ul>
                         </li>
                     </ul>

@@ -13,7 +13,11 @@ class ApiController extends \BaseController
 
     public function index()
     {
-        return \View::make('index');
+        $projects = $this->getProjects($this->client);
+        $data = [
+            'projects'  => $projects
+        ];
+        return \View::make('index', $data);
     }
 
     public function milestones()
@@ -31,11 +35,14 @@ class ApiController extends \BaseController
         return $this->response;
     }
 
-    public function issues()
+    public function issues($projectId)
     {
         $projects = $this->getProjects($this->client);
         $projectMapByProjectId = [];
         foreach ($projects as $p) {
+            if ($p['id'] != $projectId) {
+                continue;
+            }
             $projectMapByProjectId[$p['id']] = $p;
         }
 
@@ -46,10 +53,10 @@ class ApiController extends \BaseController
         }
 
         $issueMapByUserId = [];
-        foreach ($projects as $p) {
+        foreach ($projectMapByProjectId as $pid => $p) {
             $issues = $this->getIssues($this->client, $p);
             foreach ($issues as $i) {
-                if (empty($i['assignee']['id'])) {
+                if (empty($i['assignee']['id']) || $i['state'] != 'opened') {
                     continue;
                 }
                 if (empty($issueMapByUserId[$i['assignee']['id']])) {
@@ -57,12 +64,13 @@ class ApiController extends \BaseController
                     $issueMapByUserId[$i['assignee']['id']]->user = $userMapByUserId[$i['assignee']['id']];
                     $issueMapByUserId[$i['assignee']['id']]->issues = [];
                 }
-                $i['web_url'] = $projectMapByProjectId[$i['project_id']]['web_url'] . '/issues/' . $i['iid'];
+                $i['web_url'] = $projectMapByProjectId[$p['id']]['web_url'] . '/issues/' . $i['iid'];
                 $issueMapByUserId[$i['assignee']['id']]->issues[] = $i;
             }
         }
         $data = [
-            'members' => $issueMapByUserId
+            'projects' => $projects,
+            'members'  => $issueMapByUserId
         ];
         return \View::make('issues', $data);
     }

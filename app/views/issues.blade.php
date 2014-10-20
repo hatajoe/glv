@@ -40,7 +40,6 @@
                             <tr>
                                 <th>id</th>
                                 <th>title</th>
-                                <th>state</th>
                                 <th>milestone</th>
                                 <th>created_at</th>
                                 <th>updated_at</th>
@@ -51,7 +50,6 @@
                                 <tr>
                                     <th>{{ $i['id'] }}</th>
                                     <th><a href='{{ $i["web_url"] }}' target=”_blank”>{{ $i['title'] }}</a></th>
-                                    <th>{{ $i['state'] }}</th>
                                     <th>{{ $i['milestone']['title'] }}</th>
                                     <th>{{ $i['created_at'] }}</th>
                                     <th>{{ $i['updated_at'] }}</th>
@@ -62,7 +60,6 @@
                             <tr>
                                 <th>id</th>
                                 <th>title</th>
-                                <th>state</th>
                                 <th>milestone</th>
                                 <th>created_at</th>
                                 <th>updated_at</th>
