@@ -13,25 +13,10 @@ class ApiController extends \BaseController
 
     public function index()
     {
-        $projects = $this->getProjects($this->client);
-        $projectsHasIssues = [];
-        foreach ($projects as $p) {
-            $issues = $this->getIssues($this->client, $p);
-            $hasIssue = false;
-            foreach ($issues as $i) {
-                if ($i['state'] != 'opened') {
-                    continue;
-                }
-                $hasIssue = true;
-                break;
-            }
-            if ($hasIssue) {
-                $projectsHasIssues[] = $p;
-            }
-        }
+        $users = $this->getUsers($this->client);
         $data = [
-            'projects' => array_sort($projectsHasIssues, function ($v) {
-                return $v['path_with_namespace'];
+            'users' => array_sort($users, function ($v) {
+                return $v['username'];
             })
         ];
         return \View::make('index', $data);
@@ -52,61 +37,35 @@ class ApiController extends \BaseController
         return $this->response;
     }
 
-    public function issues($projectId)
+    public function issues($userId)
     {
-        $projects = $this->getProjects($this->client);
-        $projectMapByProjectId = [];
-        foreach ($projects as $p) {
-            $projectMapByProjectId[$p['id']] = $p;
-        }
-
         $users = $this->getUsers($this->client);
-        $userMapByUserId = [];
+        $user = null;
         foreach ($users as $u) {
-            $userMapByUserId[$u['id']] = $u;
+            if ($userId != $u['id']) {
+                continue;
+            }
+            $user = $u;
+            break;
         }
-
-        $selectedProject = null;
-        $projectsHasIssues = [];
-        $issueMapByUserId = [];
+        $projects = $this->getProjects($this->client);
+        $is = [];
         foreach ($projects as $p) {
-            $ms = $this->getMilestones($this->client, $p);
             $issues = $this->getIssues($this->client, $p);
-            $hasIssue = false;
             foreach ($issues as $i) {
-                if (empty($i['assignee']['id']) || $i['state'] != 'opened') {
+                if (empty($i['assignee']['id']) || $i['assignee']['id'] != $userId) {
                     continue;
                 }
-                if ($p['id'] == $projectId) {
-                    if (empty($issueMapByUserId[$i['assignee']['id']])) {
-                        $issueMapByUserId[$i['assignee']['id']] = new \stdClass();
-                        $issueMapByUserId[$i['assignee']['id']]->user = $userMapByUserId[$i['assignee']['id']];
-                        $issueMapByUserId[$i['assignee']['id']]->issues = [];
-                    }
-                    $i['issue_url'] = $projectMapByProjectId[$p['id']]['web_url'] . '/issues/' . $i['iid'];
-                    if (isset($i['milestone'])) {
-                        foreach ($ms[$p['id']] as $m) {
-                            if ($m['id'] != $i['milestone']['id']) {
-                                continue;
-                            }
-                            $i['milestone_url'] = $projectMapByProjectId[$p['id']]['web_url'] . '/milestones/' . $m['iid'];
-                        }
-                    }
-                    $issueMapByUserId[$i['assignee']['id']]->issues[] = $i;
-                    $selectedProject = $p;
-                }
-                $hasIssue = true;
-            }
-            if ($hasIssue) {
-                $projectsHasIssues[] = $p;
+                $i['issue_url'] = $p['web_url'] . '/issues/' . $i['iid'];
+                $is[] = $i;
             }
         }
         $data = [
-            'project'  => $selectedProject,
-            'projects' => array_sort($projectsHasIssues, function ($v) {
-                return $v['path_with_namespace'];
+            'user'  => $user,
+            'users' => array_sort($users, function ($v) {
+                return $v['username'];
             }),
-            'members'  => $issueMapByUserId
+            'issues' => $is
         ];
         return \View::make('issues', $data);
     }

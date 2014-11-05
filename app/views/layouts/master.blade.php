@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Livet Debug Tool</title>
+        <title>GitLab Viewer</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
@@ -60,12 +60,12 @@
                         <li class="treeview">
                             <a href="#">
                                 <i class="fa fa-th"></i>
-                                <span>Issues</span>
+                                <span>members</span>
                                 <i class="fa fa-angle-left pull-right"></i>
                             </a>
                             <ul class="treeview-menu">
-                                @foreach ($projects as $p)
-                                    <li><a href="/issues/{{ $p['id'] }}"><i class="fa fa-angle-double-right"></i>{{ $p['path_with_namespace'] }}</a></li>
+                                @foreach ($users as $u)
+                                    <li><a href="/issues/{{ $u['id'] }}"><i class="fa fa-angle-double-right"></i>{{ $u['username'] }}</a></li>
                                 @endforeach
                             </ul>
                         </li>
